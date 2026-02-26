@@ -3,114 +3,176 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NZ Trip 2026</title>
-    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIk5aIFRyaXAgMjAyNiIsCiAgInNob3J0X25hbWUiIjogIue0kOilv+itpSIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjZjlmOWY5IiwKICAidGhlbWVfY29sb3IiOiAiI2ZmZmZmZiIsCiAgImljb25zIjogW3sgInNyYyI6ICJodHRwczovL2Nkbi1pY29ucy1wbmcuZmxhdGljb24uY29tLzUxMi84MjYvODI2MDcwLnBuZyIsICJzaXplcyI6ICI1MTJ4NTEyIiwgInR5cGUiOiAiaW1hZ2UvcG5nIiB9XQp9">
+    <title>NZ South Island 2026</title>
     <style>
-        :root { --primary: #333; --accent: #81b29a; --warning: #e07a5f; --info: #3d405b; --bg: #f9f9f9; }
+        :root { --primary: #333; --accent: #81b29a; --warning: #e07a5f; --info: #3d405b; --bg: #f9f9f9; --white: #ffffff; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, "Noto Sans TC", sans-serif; background: var(--bg); color: var(--primary); margin: 0; padding: env(safe-area-inset-top) 15px 100px 15px; }
+        body { font-family: -apple-system, "Noto Sans TC", "Microsoft JhengHei", sans-serif; background: var(--bg); color: var(--primary); margin: 0; padding: env(safe-area-inset-top) 15px 100px 15px; }
         
-        /* 日式極簡 Header */
-        header { padding: 30px 0 20px 0; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
-        header h1 { font-weight: 300; font-size: 24px; letter-spacing: 2px; margin: 0; }
-        header p { font-size: 12px; color: #888; margin: 5px 0 0 0; }
+        /* 極簡標題 */
+        header { padding: 40px 0 20px 5px; border-bottom: 1px solid #eee; margin-bottom: 30px; }
+        header h1 { font-weight: 200; font-size: 28px; letter-spacing: 4px; margin: 0; }
+        header p { font-size: 11px; color: #aaa; margin: 8px 0 0 0; text-transform: uppercase; }
 
-        /* 卡片設計 */
-        .day-card { background: white; border-radius: 1px; padding: 20px; margin-bottom: 25px; border-left: 3px solid var(--accent); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-        .date-label { font-size: 12px; font-weight: bold; color: var(--accent); margin-bottom: 5px; }
-        .location-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; border-bottom: 1px dashed #eee; padding-bottom: 10px; }
-        
+        /* 行程卡片 */
+        .day-card { background: var(--white); border-radius: 2px; padding: 25px; margin-bottom: 30px; border-left: 4px solid var(--accent); box-shadow: 0 10px 30px rgba(0,0,0,0.03); position: relative; }
+        .date-label { font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 8px; font-family: monospace; }
+        .location-title { font-size: 20px; font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .location-title small { font-size: 13px; color: #888; font-weight: normal; }
+
+        /* 內容區塊 */
+        .section { margin-bottom: 20px; }
+        .section-type { font-size: 11px; font-weight: bold; color: #bbb; text-transform: uppercase; margin-bottom: 8px; display: block; letter-spacing: 1px; }
+        .item { margin-bottom: 15px; padding-left: 0px; }
+        .item-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .item-desc { font-size: 13px; color: #666; margin-top: 5px; line-height: 1.6; }
+
         /* 標籤 */
-        .tag { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; margin-right: 5px; margin-bottom: 5px; }
-        .tag-res { border: 1px solid var(--warning); color: var(--warning); font-weight: bold; }
-        .tag-food { background: #f4f1de; color: #d62828; }
-        
-        /* 區塊內容 */
-        .item { margin-bottom: 15px; }
-        .item-title { font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: space-between; }
-        .item-desc { font-size: 13px; color: #666; margin-top: 4px; line-height: 1.5; }
-        
-        /* 按鈕 */
-        .nav-btn { display: inline-flex; align-items: center; background: #fff; border: 1px solid #ddd; padding: 5px 12px; border-radius: 4px; text-decoration: none; color: #555; font-size: 12px; margin-top: 8px; transition: 0.2s; }
-        .nav-btn:active { background: #eee; }
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 2px; font-size: 10px; font-weight: bold; }
+        .tag-res { border: 1px solid var(--warning); color: var(--warning); }
+        .tag-food { background: #fdf2f0; color: #d62828; }
+        .tag-info { background: #eef2f7; color: var(--info); }
 
-        /* 固定底部工具列 */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 15px; border-top: 1px solid #eee; }
-        .nav-icon { text-align: center; text-decoration: none; color: #999; font-size: 10px; }
+        /* 功能按鈕 */
+        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
+        .action-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; background: #fff; border: 1px solid #eee; padding: 8px; border-radius: 4px; text-decoration: none; color: #444; font-size: 12px; transition: 0.2s; }
+        .action-btn:active { background: #f5f5f5; border-color: #ddd; }
+
+        /* 底部導覽 */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 12px 10px calc(12px + env(safe-area-inset-bottom)) 10px; border-top: 1px solid #eee; z-index: 100; }
+        .nav-icon { text-align: center; text-decoration: none; color: #bbb; font-size: 10px; flex: 1; }
         .nav-icon.active { color: var(--accent); }
+        .nav-icon i { font-size: 20px; display: block; margin-bottom: 4px; }
+
+        /* 工具區 */
+        .tool-card { background: var(--info); color: white; border-radius: 2px; padding: 25px; margin-bottom: 30px; }
+        .tool-card h3 { margin: 0 0 15px 0; font-size: 18px; font-weight: 300; }
+        .tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 13px; }
+        .tool-item { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>NZ JOURNEY</h1>
-    <p>03.04 — 03.21 南島自駕紀錄</p>
+<header id="top">
+    <h1>NZ SOUTH</h1>
+    <p>Journey Record / 03.04 — 03.21</p>
 </header>
 
 <div class="day-card">
-    <div class="date-label">DAY 01 | 03/04 (WED)</div>
-    <div class="location-title">基督城 Christchurch</div>
-    <div class="item">
-        <div class="item-title">✈️ 抵達與取車 <span class="tag tag-res">預約: 227599023</span></div>
-        <div class="item-desc">Ezi Car Rental 取車。檢查保險與車況。</div>
-        <a href="https://www.google.com/maps/search/Christchurch+Airport+Ezi+Car+Rental" class="nav-btn">📍 地圖導航</a>
+    <div class="date-label">03/04 - 03/06</div>
+    <div class="location-title">基督城 <small>Christchurch</small></div>
+    
+    <div class="section">
+        <span class="section-type">Arrival & Transport</span>
+        <div class="item">
+            <div class="item-title">✈️ 航班 CI53 / 取車 <span class="tag tag-res">REF: 227599023</span></div>
+            <div class="item-desc">Ezi Car Rental 取車。入住 <b>BreakFree on Cashel</b> 或 <b>Airbnb</b>。</div>
+            <div class="btn-group">
+                <a href="https://www.google.com/maps/search/?api=1&query=Christchurch+Airport" class="action-btn">📍 機場導航</a>
+                <a href="https://www.google.com/maps/search/?api=1&query=Riverside+Market" class="action-btn">🍴 Riverside</a>
+            </div>
+        </div>
     </div>
-    <div class="item">
-        <div class="item-title">🍽️ Riverside Market</div>
-        <div class="item-desc"><span class="tag tag-food">必吃</span> 羊肉捲餅、希臘料理。</div>
+
+    <div class="section">
+        <span class="section-type">Highlight</span>
+        <div class="item">
+            <div class="item-title">🌸 植物園與 New Brighton Pier</div>
+            <div class="item-desc">週五晚上可去 New Brighton Pier 看夕陽。<span class="tag tag-food">必吃</span> <b>Smokey T's</b> 烤肉、<b>Bar Yoku</b>。</div>
+        </div>
     </div>
 </div>
 
 <div class="day-card">
-    <div class="date-label">DAY 04-05 | 03/07-08</div>
-    <div class="location-title">蒂卡波湖 Lake Tekapo</div>
-    <div class="item">
-        <div class="item-title">🌌 牧羊人教堂星空</div>
-        <div class="item-desc">世界頂級暗空保護區。晚上10點後是銀河觀賞黃金時段。</div>
-        <a href="https://www.google.com/maps/search/Church+of+the+Good+Shepherd" class="nav-btn">📍 地圖導航</a>
-    </div>
-    <div class="item">
-        <div class="item-title">🍣 High Country Salmon</div>
-        <div class="item-desc"><span class="tag tag-food">必點</span> 新鮮鮭魚生魚片、煙燻鮭魚。</div>
+    <div class="date-label">03/07 - 03/08</div>
+    <div class="location-title">西海岸 <small>Fox Glacier / Franz Josef</small></div>
+    <div class="section">
+        <span class="section-type">Activity</span>
+        <div class="item">
+            <div class="item-title">🚁 冰川健行與馬松森湖</div>
+            <div class="item-desc">馬松森湖 (Lake Matheson) 倒影。住宿 <b>Franz Josef Glacier Airbnb</b>。</div>
+            <div class="btn-group">
+                <a href="https://www.google.com/maps/search/?api=1&query=Lake+Matheson" class="action-btn">📍 馬松森湖導航</a>
+                <a href="https://www.google.com/maps/search/?api=1&query=Fat+Pipi+Pizza" class="action-btn">🍕 Fat Pipi Pizza</a>
+            </div>
+        </div>
     </div>
 </div>
 
 <div class="day-card">
-    <div class="date-label">DAY 10-12 | 03/13-15</div>
-    <div class="location-title">皇后鎮 Queenstown</div>
-    <div class="item">
-        <div class="item-title">🚠 Skyline Luge</div>
-        <div class="item-desc"><span class="tag tag-res">預約制</span> 俯瞰 Wakatipu 湖最佳地點。</div>
-    </div>
-    <div class="item">
-        <div class="item-title">🍔 Fergburger</div>
-        <div class="item-desc"><span class="tag tag-food">必吃</span> 經典鹿肉漢堡。建議離峰時段排隊。</div>
-        <a href="https://www.google.com/maps/search/Fergburger+Queenstown" class="nav-btn">📍 地圖導航</a>
-    </div>
-</div>
-
-<div class="day-card" style="border-left-color: var(--info); background: #f0f4f7;">
-    <div class="location-title">🧳 旅途中必備</div>
-    <div class="item-desc">
-        • <b>緊急電話：</b> 111 (警察/救護)<br>
-        • <b>道路救援：</b> 0800 500 222 (AA)<br>
-        • <b>天氣預報：</b> 紐西蘭一日四季，必備防風外套。<br>
-        • <b>超市必買：</b> Whittaker's 巧克力、Manuka 蜂蜜。
+    <div class="date-label">03/09 - 03/11</div>
+    <div class="location-title">瓦納卡 <small>Wānaka</small></div>
+    <div class="section">
+        <span class="section-type">Must Do</span>
+        <div class="item">
+            <div class="item-title">🥾 Roys Peak 挑戰 <span class="tag tag-info">日出行程</span></div>
+            <div class="item-desc">超美稜線。下午去看 <b>That Wanaka Tree</b>。</div>
+            <div class="btn-group">
+                <a href="https://www.google.com/maps/search/?api=1&query=Roys+Peak+Track" class="action-btn">📍 Roys Peak</a>
+                <a href="https://www.google.com/maps/search/?api=1&query=Francesca's+Italian+Kitchen" class="action-btn">🍝 Francesca</a>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="bottom-nav">
-    <a href="#" class="nav-icon active">🏠<br>行程</a>
-    <a href="tel:111" class="nav-icon">📞<br>緊急</a>
-    <a href="https://www.xe.com/currencyconverter/convert/?Amount=1&From=NZD&To=TWD" class="nav-icon">💰<br>匯率</a>
+<div class="day-card">
+    <div class="date-label">03/12 - 03/14</div>
+    <div class="location-title">皇后鎮 <small>Queenstown</small></div>
+    <div class="section">
+        <span class="section-type">Adventure & Food</span>
+        <div class="item">
+            <div class="item-title">🍔 Fergburger & Skyline Luge</div>
+            <div class="item-desc"><span class="tag tag-food">必點</span> 鹿肉堡。晚上去 <b>Patagonia</b> 吃冰淇淋。</div>
+            <div class="btn-group">
+                <a href="https://www.google.com/maps/search/?api=1&query=Fergburger" class="action-btn">📍 Fergburger</a>
+                <a href="https://www.google.com/maps/search/?api=1&query=Skyline+Queenstown" class="action-btn">🚠 纜車</a>
+            </div>
+        </div>
+    </div>
 </div>
 
-<script>
-    // PWA Service Worker 註冊 (基礎版)
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('data:text/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdmZXRjaCcsIGZ1bmN0aW9uKGV2ZW50KSB7fSk7');
-    }
-</script>
+<div class="day-card">
+    <div class="date-label">03/15 - 03/17</div>
+    <div class="location-title">庫克山與蒂卡波湖 <small>Mt Cook / Tekapo</small></div>
+    <div class="section">
+        <span class="section-type">Nature</span>
+        <div class="item">
+            <div class="item-title">🌌 牧羊人教堂星空 / 胡克谷步道</div>
+            <div class="item-desc"><span class="tag tag-food">必買</span> <b>High Country Salmon</b> 鮭魚。</div>
+            <div class="btn-group">
+                <a href="https://www.google.com/maps/search/?api=1&query=Hooker+Valley+Track" class="action-btn">📍 胡克谷導航</a>
+                <a href="https://www.google.com/maps/search/?api=1&query=Church+of+the+Good+Shepherd" class="action-btn">⛪ 教堂</a>
+            </div>
+        </div>
+    </div>
+</div>
 
-</body>
-</html>
+<div class="day-card">
+    <div class="date-label">03/18 - 03/21</div>
+    <div class="location-title">尾聲與回程 <small>Return to CHC</small></div>
+    <div class="section">
+        <span class="section-type">Flight Info</span>
+        <div class="item">
+            <div class="item-title">✈️ NZ626 / CI54 <span class="tag tag-res">REF: 2RLC2H</span></div>
+            <div class="item-desc">基督城機場還車。03/21 班機啟程回台。</div>
+        </div>
+    </div>
+</div>
+
+<div class="tool-card" id="tools">
+    <h3>旅途小工具</h3>
+    <div class="tool-grid">
+        <div class="tool-item">
+            <b>緊急電話</b><br>撥打 111 (SOS)
+        </div>
+        <div class="tool-item">
+            <b>道路救援</b><br>0800 500 222
+        </div>
+        <div class="tool-item">
+            <b>航班代號</b><br>AG58IH / 2RLC2H
+        </div>
+        <div class="tool-item">
+            <b>租車資訊</b><br>Ezi Car Rental
+        </div>
+    </div>
+    <div style="margin-top:20px; font-size:11px;
