@@ -6,133 +6,224 @@
     <title>NZ JOURNEY 2026</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --main-bg: #f8f8f7; --card-bg: #ffffff; --text-primary: #1d1d1f; --text-secondary: #86868b; --accent: #b59f7b; --highlight: #fdf2f0; --highlight-text: #e07a5f; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, "SF Pro Display", "Noto Sans TC", sans-serif; background: var(--main-bg); color: var(--text-primary); margin: 0; padding-top: 130px; padding-bottom: 100px; }
+        :root {
+            --bg: #FDFDFB;
+            --card: #FFFFFF;
+            --accent: #B59F7B;
+            --text: #1D1D1F;
+            --sub: #86868B;
+            --shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
 
-        /* 置頂導覽與日期 */
-        .sticky-top { position: fixed; top: 0; width: 100%; background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); z-index: 1000; border-bottom: 0.5px solid #d2d2d7; }
-        header { padding: 15px 20px 5px; text-align: center; }
-        header h1 { font-size: 11px; font-weight: 500; letter-spacing: 3px; color: var(--text-secondary); margin: 0; }
-        header .trip-title { font-size: 18px; font-weight: 600; margin: 3px 0; }
-        .date-scroller { display: flex; overflow-x: auto; padding: 10px 15px 15px; gap: 15px; }
-        .date-scroller::-webkit-scrollbar { display: none; }
-        .date-tab { flex: 0 0 50px; text-align: center; padding: 10px 0; border-radius: 12px; text-decoration: none; color: var(--text-secondary); }
-        .date-tab.active { background: #000; color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .date-tab span { font-size: 9px; display: block; margin-bottom: 2px; }
-        .date-tab b { font-size: 16px; }
+        body {
+            font-family: -apple-system, "PingFang TC", sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding-bottom: 120px;
+            -webkit-font-smoothing: antialiased;
+        }
 
-        /* 行程容器 */
-        .content { padding: 20px; }
-        .day-label { font-size: 28px; font-weight: 700; margin-bottom: 20px; letter-spacing: -1px; }
+        /* 頂部導覽列 (毛玻璃效果) */
+        header {
+            position: fixed;
+            top: 0; width: 100%;
+            background: rgba(253, 253, 251, 0.85);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            padding: 20px 0;
+            text-align: center;
+            border-bottom: 0.5px solid #E5E5E5;
+        }
+        .trip-meta { font-size: 10px; letter-spacing: 2px; color: var(--sub); text-transform: uppercase; }
+        .trip-name { font-size: 18px; font-weight: 600; margin-top: 5px; }
 
-        /* 卡片設計 */
-        .item-card { background: var(--card-bg); border-radius: 20px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 12px rgba(0,0,0,0.03); position: relative; }
-        .item-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-        .category { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); }
-        .time { font-size: 20px; font-weight: 700; color: var(--text-primary); }
-        .title { font-size: 17px; font-weight: 600; margin: 5px 0; }
-        .desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        /* 橫向日期選擇器 */
+        .date-nav {
+            display: flex;
+            overflow-x: auto;
+            padding: 85px 15px 15px;
+            gap: 12px;
+            background: var(--bg);
+        }
+        .date-nav::-webkit-scrollbar { display: none; }
+        .date-btn {
+            flex: 0 0 55px;
+            text-align: center;
+            padding: 10px 0;
+            border-radius: 15px;
+            color: var(--sub);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .date-btn.active {
+            background: #000;
+            color: #fff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .date-btn span { font-size: 10px; display: block; font-weight: bold; }
+        .date-btn b { font-size: 18px; }
 
-        /* 訂位代碼小方塊 */
-        .ref-box { background: #f5f5f7; padding: 10px 15px; border-radius: 12px; margin-top: 12px; display: flex; justify-content: space-between; align-items: center; }
-        .ref-label { font-size: 10px; color: var(--text-secondary); }
-        .ref-code { font-family: monospace; font-size: 15px; font-weight: 600; color: #000; letter-spacing: 1px; }
+        /* 主內容區 */
+        .main-content { padding: 0 20px; }
+        .day-count { font-size: 32px; font-weight: 700; margin: 10px 0 25px; letter-spacing: -1px; }
 
-        /* 導航按鈕 */
-        .btn-action { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 15px; padding: 12px; background: #fff; border: 0.5px solid #d2d2d7; border-radius: 12px; color: var(--text-primary); text-decoration: none; font-size: 13px; font-weight: 500; transition: 0.2s; }
-        .btn-action:active { background: #f5f5f7; }
+        /* 景點封面卡片 */
+        .hero-card {
+            width: 100%;
+            height: 220px;
+            border-radius: 24px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+        .hero-card img { width: 100%; height: 100%; object-fit: cover; }
+        .hero-overlay {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            padding: 20px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            color: #fff;
+        }
 
-        /* 天氣提示 */
-        .weather-bar { margin-bottom: 25px; display: flex; gap: 10px; overflow-x: auto; }
-        .w-item { background: #fff; padding: 12px; border-radius: 15px; min-width: 80px; text-align: center; }
-        .w-item i { font-size: 20px; color: #ffbc00; margin: 5px 0; }
+        /* 氣象資訊 */
+        .weather-section { margin-bottom: 30px; }
+        .weather-scroll { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 5px; }
+        .weather-item {
+            flex: 0 0 65px;
+            background: #fff;
+            padding: 12px;
+            border-radius: 18px;
+            text-align: center;
+            font-size: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+        .weather-item i { font-size: 20px; color: #FFBC00; margin: 8px 0; }
 
-        /* 底部欄 */
-        .bottom-nav { position: fixed; bottom: 20px; left: 20px; right: 20px; background: rgba(0,0,0,0.9); border-radius: 25px; display: flex; padding: 12px; backdrop-filter: blur(10px); }
-        .nav-link { flex: 1; text-align: center; color: #666; text-decoration: none; font-size: 10px; }
-        .nav-link.active { color: #fff; }
-        .nav-link i { font-size: 20px; display: block; margin-bottom: 4px; }
+        /* 行程卡片 */
+        .schedule-item {
+            background: var(--card);
+            border-radius: 22px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+        .item-time { font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 12px; }
+        .item-tag { 
+            display: inline-block;
+            font-size: 9px; font-weight: 700; 
+            padding: 3px 8px; border-radius: 6px;
+            background: #F5F5F7; color: var(--accent);
+            text-transform: uppercase; margin-bottom: 8px;
+        }
+        .item-title { font-size: 17px; font-weight: 600; margin-bottom: 8px; }
+        .item-info { font-size: 13px; color: var(--sub); line-height: 1.6; }
+
+        /* 底部操作按鈕 */
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        .action-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            border: 0.5px solid #E5E5E5;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            color: var(--text);
+            background: #fff;
+        }
+
+        /* 懸浮底部導覽列 */
+        .bottom-bar {
+            position: fixed; bottom: 30px; left: 20px; right: 20px;
+            background: rgba(0,0,0,0.9);
+            border-radius: 30px;
+            display: flex;
+            padding: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+        .nav-item { flex: 1; text-align: center; color: #666; text-decoration: none; font-size: 10px; }
+        .nav-item.active { color: #fff; }
+        .nav-item i { font-size: 22px; display: block; margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
-<div class="sticky-top">
-    <header>
-        <h1>NEW ZEALAND 2026</h1>
-        <div class="trip-title">南島冒險公路旅行</div>
-    </header>
-    <div class="date-scroller">
-        <a href="#" class="date-tab active"><span>WED</span><b>04</b></a>
-        <a href="#" class="date-tab"><span>THU</span><b>05</b></a>
-        <a href="#" class="date-tab"><span>FRI</span><b>06</b></a>
-        <a href="#" class="date-tab"><span>SAT</span><b>07</b></a>
-        <a href="#" class="date-tab"><span>SUN</span><b>08</b></a>
-    </div>
-</div>
+<header>
+    <div class="trip-meta">Family Trip 2026</div>
+    <div class="trip-name">紐西蘭之旅</div>
+</header>
 
-<div class="content">
-    <div class="day-label">第一天</div>
+<nav class="date-nav">
+    <a href="#" class="date-btn active"><span>WED</span><b>04</b></a>
+    <a href="#" class="date-btn"><span>THU</span><b>05</b></a>
+    <a href="#" class="date-btn"><span>FRI</span><b>06</b></a>
+    <a href="#" class="date-btn"><span>SAT</span><b>07</b></a>
+    <a href="#" class="date-btn"><span>SUN</span><b>08</b></a>
+    </nav>
 
-    <div class="item-card">
-        <div class="item-header">
-            <span class="category"><i class="fas fa-plane"></i> Flight</span>
-            <span class="time">09:05</span>
-        </div>
-        <div class="title">紐西蘭航空 NZ214</div>
-        <div class="desc">
-            預計飛行 3h 25m<br>
-            <span style="color:var(--highlight-text); font-weight:600;">⚠️ 關櫃時間: 07:35am (行李托運截止)</span>
-        </div>
-        <div class="ref-box">
-            <span class="ref-label">Booking Reference</span>
-            <span class="ref-code">AG58IH</span>
+<main class="main-content">
+    <div class="day-count">第一天</div>
+
+    <div class="hero-card">
+        <img src="https://images.unsplash.com/photo-1507699622108-4be3abd695ad?auto=format&fit=crop&w=800&q=80">
+        <div class="hero-overlay">
+            <div style="font-size: 10px; opacity: 0.8;"><i class="fas fa-location-dot"></i> Christchurch</div>
+            <div style="font-size: 22px; font-weight: 600;">基督城冒險啟程</div>
         </div>
     </div>
 
-    <div class="item-card">
-        <div class="item-header">
-            <span class="category"><i class="fas fa-bus"></i> Transport</span>
-            <span class="time">14:30</span>
-        </div>
-        <div class="title">抵達基督城機場</div>
-        <div class="desc">領取行李後，預計搭乘紫線公車 (Purple Line)</div>
-        <div class="ref-box">
-            <span class="ref-label">建議班次</span>
-            <span class="ref-code">15:07 / 15:37</span>
+    <div class="weather-section">
+        <div style="font-size: 18px; font-weight: 600; margin-bottom: 12px;">Christchurch 天氣預報</div>
+        <div class="weather-scroll">
+            <div class="weather-item">現在<br><i class="fas fa-sun"></i><br>18°</div>
+            <div class="weather-item">13:00<br><i class="fas fa-sun"></i><br>21°</div>
+            <div class="weather-item">15:00<br><i class="fas fa-cloud"></i><br>19°</div>
+            <div class="weather-item">17:00<br><i class="fas fa-sun"></i><br>16°</div>
+            <div class="weather-item">19:00<br><i class="fas fa-moon"></i><br>12°</div>
         </div>
     </div>
 
-    <div class="item-card">
-        <div class="item-header">
-            <span class="category"><i class="fas fa-house"></i> Airbnb</span>
-            <span class="time">16:00</span>
+    <div class="schedule-item">
+        <div class="item-time">09:05</div>
+        <div class="item-tag">Flight</div>
+        <div class="item-title">紐西蘭航空 NZ214</div>
+        <div class="item-info">
+            訂位代碼：<b style="color:#000; font-family:monospace;">AG58IH</b><br>
+            ⚠️ 關櫃時間：07:35am<br>
+            航程預計：3h 25m
         </div>
-        <div class="title">Canterbury Region 入住</div>
-        <div class="desc">31 Allen Street, Christchurch Central City</div>
-        <a href="https://www.google.com/maps/search/?api=1&query=31+Allen+Street,Christchurch+Central+City" class="btn-action">
-            <i class="fas fa-location-arrow"></i> 開啟地圖導航
-        </a>
+        <div class="btn-group">
+            <a href="#" class="action-btn">查看登機證</a>
+            <a href="#" class="action-btn">機場地圖</a>
+        </div>
     </div>
 
-    <div class="item-card">
-        <div class="item-header">
-            <span class="category"><i class="fas fa-utensils"></i> Food</span>
-            <span class="time">17:00</span>
+    <div class="schedule-item">
+        <div class="item-time">16:00</div>
+        <div class="item-tag">Airbnb</div>
+        <div class="item-title">Canterbury Region Stay</div>
+        <div class="item-info">
+            31 Allen Street, Christchurch Central City<br>
+            自助入住：門鎖密碼 1234
         </div>
-        <div class="title">Bar Yoku (The Welder)</div>
-        <div class="desc">20 Welles Street, Christchurch Central City</div>
-        <a href="https://www.google.com/maps/search/?api=1&query=Bar+Yoku,The+Welder,Christchurch" class="btn-action">
-            <i class="fas fa-map-marker-alt"></i> 查看餐廳位置
-        </a>
+        <div class="btn-group">
+            <a href="https://www.google.com/maps/search/?api=1&query=31+Allen+Street+Christchurch" class="action-btn">
+                <i class="fas fa-location-arrow"></i> Google Maps 導航
+            </a>
+        </div>
     </div>
-</div>
+</main>
 
-<div class="bottom-nav">
-    <a href="#" class="nav-link active"><i class="fas fa-calendar-alt"></i>行程</a>
-    <a href="https://www.metservice.com/national" class="nav-link"><i class="fas fa-cloud-sun"></i>天氣</a>
-    <a href="tel:111" class="nav-link"><i class="fas fa-phone-alt"></i>SOS</a>
-</div>
+<nav class="bottom-bar">
+    <a href="#" class="nav-item active"><i class="fas fa-map-marked-alt"></i>行程</a>
+    <a href="#" class="nav-item"><i class="fas fa-wallet"></i>記帳</a>
+    <a href="#" class="nav-item"><i class="fas fa-cloud-sun"></i>天氣</a>
+    <a href="#" class="nav-item"><i class="fas fa-info-circle"></i>資訊</a>
+</nav>
 
 </body>
 </html>
