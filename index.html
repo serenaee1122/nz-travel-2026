@@ -2,116 +2,497 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>NZ JOURNEY 2026</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>紐西蘭南島自駕遊</title>
+    <!-- 引入日式圓潤字體 Zen Maru Gothic -->
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #F7F7F5;
-            --card: #FFFFFF;
-            --text-main: #1A1A1A;
-            --text-sub: #6B6B6B;
-            --accent: #8E7A5D;
-            --tag-food-bg: #FFF4E5; --tag-food-text: #E67E22;
-            --tag-spot-bg: #EBF5FB; --tag-spot-text: #2980B9;
-            --tag-ref-bg: #F4ECF7; --tag-ref-text: #8E44AD;
+            /* 核心主色 */
+            --dark-green: #4A6B53;  /* 墨綠色 (紐西蘭森林感) */
+            --off-white: #F9F7F3;   /* 米白色 */
+            --warm-gray: #EAE6DF;   /* 暖灰色 */
+            --text-dark: #3E3E3E;   /* 深灰字體 */
+            
+            /* 標籤顏色 (莫蘭迪可愛色系) */
+            --tag-eat: #F4A261;     /* 必吃橘 */
+            --tag-buy: #E9C46A;     /* 必買黃 */
+            --tag-photo: #D4A373;   /* 必拍粉棕 */
+            --category-bg: #DCE3DE; /* 分類底色 */
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, "Noto Sans TC", sans-serif; background: var(--bg); color: var(--text-main); margin: 0; padding-bottom: 120px; }
-
-        header { padding: 60px 20px 20px; }
-        .city-title { font-size: 32px; font-weight: 800; }
-
-        /* 行程卡片基礎 */
-        .item-card { 
-            background: var(--card); border-radius: 20px; padding: 20px; 
-            margin: 0 16px 16px 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.02);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden; cursor: pointer; position: relative;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Zen Maru Gothic', sans-serif;
+            -webkit-tap-highlight-color: transparent; /* 移除手機點擊閃爍 */
         }
 
-        /* 點擊展開的動態高度 */
-        .item-card.expanded { padding-bottom: 30px; }
+        body {
+            background-color: var(--warm-gray);
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            /* 可愛風格點陣背景 */
+            background-image: radial-gradient(#c8c3bc 1.5px, transparent 1.5px);
+            background-size: 20px 20px;
+        }
+
+        /* 模擬手機外框 */
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            min-height: 100vh;
+            background: var(--off-white);
+            position: relative;
+            box-shadow: 0 0 25px rgba(0,0,0,0.08);
+            padding-bottom: 100px; /* 留出底部導航的空間 */
+            overflow-x: hidden;
+        }
+
+        /* --- Header 區塊 --- */
+        header {
+            background: var(--dark-green);
+            color: var(--off-white);
+            padding: 35px 25px 25px;
+            border-bottom-left-radius: 35px;
+            border-bottom-right-radius: 35px;
+            box-shadow: 0 6px 20px rgba(74, 107, 83, 0.25);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+        header p {
+            font-size: 14px;
+            opacity: 0.85;
+            font-weight: 500;
+        }
+
+        /* --- Tabs 內容區 --- */
+        .tab-content {
+            display: none;
+            padding: 25px 20px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- 每日選擇切換 --- */
+        .day-selector {
+            display: flex;
+            overflow-x: auto;
+            gap: 12px;
+            margin-bottom: 25px;
+            padding-bottom: 5px;
+            scrollbar-width: none;
+        }
+        .day-selector::-webkit-scrollbar { display: none; }
         
-        .item-time-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; }
-        .item-time { font-size: 26px; font-weight: 800; }
-        .item-badge { font-size: 10px; color: #AAA; border: 0.5px solid #EEE; padding: 1px 6px; border-radius: 4px; }
-
-        /* 隱藏的詳細資訊區塊 */
-        .item-details { 
-            max-height: 0; opacity: 0; transition: all 0.4s ease;
-            border-top: 0px solid #EEE; margin-top: 0;
+        .day-btn {
+            background: var(--warm-gray);
+            border: none;
+            padding: 10px 18px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--text-dark);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
         }
-        .item-card.expanded .item-details { 
-            max-height: 500px; opacity: 1; border-top: 0.5px solid #EEE; 
-            margin-top: 15px; padding-top: 15px; 
+        .day-btn.active {
+            background: var(--dark-green);
+            color: var(--off-white);
+            transform: scale(1.05);
         }
 
-        /* 標籤樣式 */
-        .tag { display: inline-block; font-size: 11px; padding: 3px 8px; border-radius: 6px; margin: 4px 4px 0 0; font-weight: 600; }
-        .tag-food { background: var(--tag-food-bg); color: var(--tag-food-text); }
-        .tag-spot { background: var(--tag-spot-bg); color: var(--tag-spot-text); }
-        .tag-ref { background: var(--tag-ref-bg); color: var(--tag-ref-text); }
+        /* --- 日期與地點標題 --- */
+        .daily-header {
+            font-size: 19px;
+            font-weight: 700;
+            margin-bottom: 18px;
+            color: var(--dark-green);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-        /* 導航按鈕 */
-        .nav-link-btn {
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            background: #1A1A1A; color: #FFF; text-decoration: none;
-            padding: 14px; border-radius: 12px; font-weight: 600; font-size: 14px; margin-top: 15px;
+        /* --- 景點卡片 --- */
+        .card {
+            background: #FFFFFF;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+            border: 1px solid rgba(0,0,0,0.02);
+        }
+        
+        .spot-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .category {
+            font-size: 13px;
+            padding: 5px 12px;
+            border-radius: 12px;
+            background: var(--category-bg);
+            color: var(--dark-green);
+            font-weight: 700;
+        }
+        .spot-title {
+            font-size: 19px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+        }
+        .spot-desc {
+            font-size: 14.5px;
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        /* 標籤系統 */
+        .tags {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .tag {
+            font-size: 12px;
+            padding: 5px 12px;
+            border-radius: 14px;
+            font-weight: 700;
+            color: #FFF;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .tag-eat { background: var(--tag-eat); }
+        .tag-buy { background: var(--tag-buy); }
+        .tag-photo { background: var(--tag-photo); }
+
+        /* 停車加油資訊 (可愛小提示框) */
+        .facility-info {
+            background: var(--off-white);
+            border: 2px dashed var(--warm-gray);
+            border-radius: 16px;
+            padding: 12px 15px;
+            font-size: 13.5px;
+            color: #555;
+            margin-bottom: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        /* 按鈕系統 */
+        .actions {
+            display: flex;
+            gap: 12px;
+        }
+        .btn {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: 0.2s;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .btn-nav {
+            background: var(--dark-green);
+            color: var(--off-white);
+            box-shadow: 0 4px 10px rgba(74, 107, 83, 0.2);
+        }
+        .btn-photo {
+            background: var(--warm-gray);
+            color: var(--text-dark);
+        }
+        .btn:active { transform: scale(0.96); }
+
+        /* --- 天氣與穿著提示卡 --- */
+        .weather-card {
+            background: linear-gradient(145deg, #E3E9E5, var(--warm-gray));
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+        .weather-card::before {
+            content: '☁️';
+            position: absolute;
+            right: -10px;
+            top: -10px;
+            font-size: 80px;
+            opacity: 0.2;
+        }
+        .weather-card h4 {
+            color: var(--dark-green);
+            margin-bottom: 10px;
+            font-size: 17px;
+            position: relative;
+            z-index: 2;
+        }
+        .weather-card p {
+            font-size: 14.5px;
+            color: #555;
+            line-height: 1.6;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* --- 底部浮動導覽條 --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 88%;
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 30px;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            z-index: 100;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+        .nav-item {
+            text-align: center;
+            color: #A0A0A0;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 8px 18px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        .nav-item.active {
+            background: var(--warm-gray);
+            color: var(--dark-green);
+        }
+        .nav-icon {
+            font-size: 22px;
+            display: block;
+            margin-bottom: 4px;
         }
     </style>
 </head>
 <body>
 
-<header>
-    <div style="font-size: 12px; color: var(--accent); letter-spacing: 2px;">NEW ZEALAND</div>
-    <h1 class="city-title">Christchurch</h1>
-</header>
+<div class="app-container">
+    <!-- App Header -->
+    <header>
+        <h1>🇳🇿 紐西蘭南島自駕遊</h1>
+        <p>探索中土世界｜2026 行程計畫</p>
+    </header>
 
-<div id="itinerary">
-    <div class="item-card" onclick="this.classList.toggle('expanded')">
-        <div class="item-badge">STAY</div>
-        <div style="font-size: 18px; font-weight: 700; margin-top: 5px;">Airbnb - Canterbury Region</div>
-        <div class="item-details">
-            <div style="font-size: 13px; color: var(--text-sub);">31 Allen Street, Christchurch Central City</div>
-            <span class="tag tag-spot">攻略</span> 位於市中心安靜街區，入住密碼將於當日發送。
-            <a href="javascript:void(0)" onclick="openMap('31 Allen Street, Christchurch')" class="nav-link-btn">
-                <i class="fas fa-location-arrow"></i> 開始導航
-            </a>
+    <!-- 頁籤 1：行程 (預設顯示) -->
+    <main id="tab-itinerary" class="tab-content active">
+        
+        <!-- 每日切換列 -->
+        <div class="day-selector">
+            <button class="day-btn active" onclick="switchDay(1)">Day 1 基督城</button>
+            <button class="day-btn" onclick="switchDay(2)">Day 2 蒂卡波湖</button>
+            <button class="day-btn" onclick="switchDay(3)">Day 3 庫克山</button>
         </div>
-    </div>
 
-    <div class="item-card" onclick="this.classList.toggle('expanded')">
-        <div class="item-time-row">
-            <span class="item-time">17:00</span>
-            <span class="item-badge">DINNER</span>
+        <!-- Day 1 內容 -->
+        <div id="day-1" class="day-detail active">
+            <div class="daily-header">📅 10月15日｜📍 基督城 ➔ 蒂卡波</div>
+
+            <!-- 景點卡片 1 -->
+            <div class="card">
+                <div class="spot-header">
+                    <span class="category">🏔️ 景點</span>
+                </div>
+                <h3 class="spot-title">好牧羊人教堂 (Church of the Good Shepherd)</h3>
+                <p class="spot-desc">坐落於蒂卡波湖畔的古老石造教堂，背景是壯麗的南阿爾卑斯山，夜晚更是絕佳的觀星聖地。</p>
+                <div class="tags">
+                    <span class="tag tag-photo">📷 必拍絕景</span>
+                </div>
+                <div class="facility-info">
+                    <span>🅿️ 停車：教堂周邊有免費公共停車場，旺季易客滿。</span>
+                    <span>⛽ 加油：鎮上有一間 NPD 加油站，建議在此加滿。</span>
+                </div>
+                <div class="actions">
+                    <a href="https://maps.google.com" target="_blank" class="btn btn-nav">🗺️ 導航</a>
+                    <label class="btn btn-photo">
+                        📝 傳旅記
+                        <input type="file" accept="image/*" style="display:none;">
+                    </label>
+                </div>
+            </div>
+
+            <!-- 景點卡片 2 -->
+            <div class="card">
+                <div class="spot-header">
+                    <span class="category">🍱 食物</span>
+                </div>
+                <h3 class="spot-title">Kohan Restaurant 湖畔日式餐廳</h3>
+                <p class="spot-desc">傳說中紐西蘭最好吃的鮭魚丼飯！可以一邊品嚐新鮮的高山淡水鮭魚，一邊欣賞蒂卡波湖的蒂芬妮藍湖水。</p>
+                <div class="tags">
+                    <span class="tag tag-eat">🤤 必吃鮭魚丼</span>
+                </div>
+                <div class="facility-info">
+                    <span>🅿️ 停車：餐廳門口有專屬車位，或停在鎮上超市旁。</span>
+                </div>
+                <div class="actions">
+                    <a href="https://maps.google.com" target="_blank" class="btn btn-nav">🗺️ 導航</a>
+                    <label class="btn btn-photo">
+                        📝 傳旅記
+                        <input type="file" accept="image/*" style="display:none;">
+                    </label>
+                </div>
+            </div>
+
+            <!-- 天氣與穿著提示卡 -->
+            <div class="card weather-card">
+                <h4>🏕️ 今日建議穿著 ＆ 天氣提示</h4>
+                <p><strong>氣溫預測：</strong> 8°C ~ 18°C (早晚溫差極大)<br>
+                <strong>穿著建議：</strong> 紐西蘭春/秋季風大且氣候多變，強烈建議「洋蔥式穿搭」。白天可穿長袖T恤，入夜觀星務必穿上防風防水的厚外套、毛帽與保暖手套。</p>
+            </div>
         </div>
-        <div style="font-size: 17px; font-weight: 600;">Bar Yoku</div>
-        <div class="item-details">
-            <div style="font-size: 13px; color: var(--text-sub); margin-bottom: 10px;">The Welder, 20 Welles Street</div>
-            <span class="tag tag-food">必吃美食：壽司塔可 (Sushi Tacos)</span>
-            <span class="tag tag-food">必點菜單：炭烤串燒、和牛三明治</span>
-            <span class="tag tag-spot">景點故事</span> 位於由舊工廠改造的 The Welder 園區，是基督城最火紅的日式 Fusion 餐廳。
-            <a href="javascript:void(0)" onclick="openMap('Bar Yoku, 20 Welles Street, Christchurch')" class="nav-link-btn">
-                <i class="fas fa-utensils"></i> 導航至餐廳
-            </a>
+
+        <!-- Day 2 內容 (預設隱藏，示意用) -->
+        <div id="day-2" class="day-detail" style="display:none;">
+            <div class="daily-header">📅 10月16日｜📍 蒂卡波 ➔ 庫克山</div>
+            <div class="card">
+                <div class="spot-header"><span class="category">🥾 活動</span></div>
+                <h3 class="spot-title">胡克谷步道 (Hooker Valley Track)</h3>
+                <p class="spot-desc">CP值最高的平緩冰川步道，來回約3小時，盡享庫克山與冰河湖美景。</p>
+                <div class="tags"><span class="tag tag-photo">✨ 必拍</span></div>
+                <div class="actions">
+                    <a href="https://maps.google.com" target="_blank" class="btn btn-nav">🗺️ 導航</a>
+                    <label class="btn btn-photo">
+                        📝 傳旅記
+                        <input type="file" accept="image/*" style="display:none;">
+                    </label>
+                </div>
+            </div>
         </div>
-    </div>
+        
+    </main>
+
+    <!-- 頁籤 2：指南 (示意) -->
+    <main id="tab-guide" class="tab-content">
+        <h2 style="margin-bottom: 20px; color: var(--dark-green);">📖 紐西蘭自駕指南</h2>
+        <div class="card">
+            <h3 class="spot-title">南島右駕注意事項 🚗</h3>
+            <p class="spot-desc">1. 紐西蘭為「右駕」，靠左行駛，轉彎千萬別逆向。<br>2. 遇到圓環 (Roundabout) 一律讓右方來車先行。<br>3. 郊區速限通常為 100km/h，進鎮前務必減速至 50km/h。</p>
+        </div>
+        <div class="card">
+            <h3 class="spot-title">超市採買推薦 🛒</h3>
+            <p class="spot-desc">PAK'nSAVE 最便宜，適合大採購；New World 環境最好；Countdown 分布最廣。</p>
+            <div class="tags"><span class="tag tag-buy">🥩 必買牛排與奇異果</span></div>
+        </div>
+    </main>
+
+    <!-- 頁籤 3：天氣 (示意) -->
+    <main id="tab-weather" class="tab-content">
+        <h2 style="margin-bottom: 20px; color: var(--dark-green);">🌤️ 一週天氣概況</h2>
+        <div class="card">
+            <p style="color: #666; font-size: 15px; line-height: 1.6;">目前為行程規劃階段，出發前一週可透過 MetService (紐西蘭官方氣象局) 確認最準確的天氣資訊。</p>
+        </div>
+    </main>
+
+    <!-- 底部浮動導覽條 -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('itinerary', this)">
+            <span class="nav-icon">🎒</span>行程
+        </div>
+        <div class="nav-item" onclick="switchTab('guide', this)">
+            <span class="nav-icon">🗺️</span>指南
+        </div>
+        <div class="nav-item" onclick="switchTab('weather', this)">
+            <span class="nav-icon">🌤️</span>天氣
+        </div>
+    </nav>
 </div>
 
 <script>
-    // 解決地址錯誤的核心：使用搜尋字串而非單純座標
-    function openMap(query) {
-        event.stopPropagation(); // 防止觸發卡片收合
-        const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
-        window.open(url, '_blank');
+    // --- 底部 Tab 切換功能 ---
+    function switchTab(tabName, element) {
+        // 隱藏所有 tab 內容
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        // 顯示選擇的 tab
+        document.getElementById('tab-' + tabName).classList.add('active');
+
+        // 更新導覽條的 UI 狀態
+        document.querySelectorAll('.nav-item').forEach(nav => {
+            nav.classList.remove('active');
+        });
+        element.classList.add('active');
+        
+        // 切換時回到頂部，更像原生 App
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // 觸覺回饋
-    document.querySelectorAll('.item-card').forEach(card => {
-        card.addEventListener('click', () => {
-            if (window.navigator.vibrate) window.navigator.vibrate(5);
+    // --- 每日行程切換功能 ---
+    function switchDay(dayNum) {
+        // 更新按鈕狀態
+        const buttons = document.querySelectorAll('.day-btn');
+        buttons.forEach((btn, index) => {
+            if(index === dayNum - 1) {
+                btn.classList.add('active');
+                // 讓按鈕自動滾動到畫面可視範圍內
+                btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+
+        // 隱藏所有天的內容
+        document.querySelectorAll('.day-detail').forEach(day => {
+            day.style.display = 'none';
+            day.classList.remove('active');
+        });
+
+        // 顯示指定的天的內容
+        const selectedDay = document.getElementById('day-' + dayNum);
+        if(selectedDay) {
+            selectedDay.style.display = 'block';
+            setTimeout(() => selectedDay.classList.add('active'), 10);
+        }
+    }
+
+    // 旅記照片上傳按鈕的簡單互動反饋
+    document.querySelectorAll('input[type="file"]').forEach(input => {
+        input.addEventListener('change', function(e) {
+            if(e.target.files.length > 0) {
+                const label = this.parentElement;
+                label.innerHTML = '✅ 已選擇照片<input type="file" accept="image/*" style="display:none;">';
+                label.style.background = '#DCE3DE';
+                label.style.color = '#4A6B53';
+            }
         });
     });
 </script>
