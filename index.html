@@ -148,3 +148,52 @@
 
 </body>
 </html>
+<style>
+    html {
+        scroll-behavior: smooth; /* 點擊日期時平滑滾動 */
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* 啟動 GPU 硬體加速，防止滑動卡頓 */
+    .date-tab, .item, .nav-btn, .bottom-nav {
+        will-change: transform;
+        transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* 模擬原生 App 的按壓回饋 */
+    .date-tab:active, .nav-btn:active, .item:active {
+        transform: scale(0.96);
+        opacity: 0.8;
+    }
+
+    /* 讓橫向捲軸滑動更流暢 */
+    .date-nav, .weather-banner {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        overscroll-behavior-x: contain;
+    }
+    
+    .date-tab, .w-hour {
+        scroll-snap-align: start;
+    }
+</style>
+
+<script>
+    // 1. 觸覺回饋 (Haptic Feedback)
+    document.querySelectorAll('.date-tab, .nav-btn, .item').forEach(el => {
+        el.addEventListener('click', () => {
+            if (window.navigator.vibrate) {
+                window.navigator.vibrate(10); // 輕微震動 10ms
+            }
+        });
+    });
+
+    // 2. 修正導航邏輯：自動編碼地點，解決地址偏差問題
+    function goToMap(locationName) {
+        // 使用搜尋模式而非座標模式，Google 會自動找最準確的地點
+        const encodedLocation = encodeURIComponent(locationName);
+        const url = `https://www.google.com/maps/search/?api=1&query=${encodedLocation}`;
+        window.open(url, '_blank');
+    }
+</script>
