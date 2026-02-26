@@ -2,160 +2,148 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NZ Journey 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>NZ JOURNEY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg: #F2F2F0; /* 截圖質感底色 */
-            --card-bg: #FFFFFF;
-            --text-main: #1D1D1F;
-            --text-sub: #86868B;
-            --accent: #B59F7B;
-            --shadow: 0 4px 20px rgba(0,0,0,0.03);
+            --bg: #F7F7F5; /* 日式和紙色調 */
+            --card: #FFFFFF;
+            --text-primary: #1A1A1A;
+            --text-secondary: #6B6B6B;
+            --accent: #8E7A5D; /* 職人棕 */
+            --status-red: #D9534F;
+            --safe-area-bottom: env(safe-area-inset-bottom);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, "SF Pro Display", "PingFang TC", sans-serif; background: var(--bg); color: var(--text-main); margin: 0; padding-bottom: 120px; }
+        body { font-family: -apple-system, "Noto Sans TC", sans-serif; background: var(--bg); color: var(--text-primary); margin: 0; padding-bottom: calc(100px + var(--safe-area-bottom)); }
 
-        /* 頂部標題 */
-        header { padding: 45px 20px 10px; text-align: center; }
-        .trip-title { font-size: 24px; font-weight: 700; letter-spacing: 1px; }
+        /* 頂部導覽 - 日式簡約 */
+        header { padding: 50px 20px 10px; background: var(--bg); text-align: left; }
+        .city-header { font-size: 32px; font-weight: 800; letter-spacing: -1px; margin: 0; }
+        .year-label { font-size: 14px; color: var(--accent); font-weight: 500; letter-spacing: 2px; }
 
-        /* 日期選擇器 */
-        .date-scroller { display: flex; overflow-x: auto; padding: 10px 20px 25px; gap: 20px; background: var(--bg); position: sticky; top: 0; z-index: 100; }
-        .date-scroller::-webkit-scrollbar { display: none; }
-        .date-item { text-align: center; min-width: 45px; text-decoration: none; color: #BBB; transition: 0.3s; }
-        .date-item.active { color: var(--text-main); position: relative; font-weight: 700; }
-        .date-item.active::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: #D64545; border-radius: 50%; }
-        .date-day { font-size: 10px; display: block; margin-bottom: 4px; }
-        .date-num { font-size: 22px; }
+        /* 橫向日期 - 左右滑動 */
+        .date-nav { display: flex; overflow-x: auto; padding: 20px; gap: 20px; sticky: top; top: 0; z-index: 100; background: rgba(247, 247, 245, 0.95); backdrop-filter: blur(10px); }
+        .date-nav::-webkit-scrollbar { display: none; }
+        .date-tab { text-align: center; min-width: 40px; text-decoration: none; color: #BBB; }
+        .date-tab.active { color: var(--text-primary); font-weight: 700; position: relative; }
+        .date-tab.active::after { content: ''; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); width: 15px; height: 2px; background: var(--accent); }
+        .d-w { font-size: 10px; display: block; margin-bottom: 4px; }
+        .d-n { font-size: 20px; }
 
         /* 主容器 */
-        .main-container { padding: 0 15px; position: relative; }
-        .day-indicator { writing-mode: vertical-lr; position: absolute; left: -5px; top: 10px; font-size: 24px; font-weight: 600; letter-spacing: 8px; color: #222; opacity: 0.9; }
+        .container { padding: 0 16px; position: relative; }
+        .day-sidebar { writing-mode: vertical-lr; position: absolute; left: -10px; top: 10px; font-size: 20px; font-weight: 600; color: #DDD; }
 
-        /* 封面圖 */
-        .hero-card { margin-left: 45px; border-radius: 20px; overflow: hidden; box-shadow: var(--shadow); margin-bottom: 25px; position: relative; }
-        .hero-card img { width: 100%; height: 200px; object-fit: cover; display: block; }
-        .hero-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 15px 20px; background: linear-gradient(transparent, rgba(0,0,0,0.5)); color: #fff; font-size: 18px; font-weight: 600; }
+        /* 住宿卡片 - 置頂優化 */
+        .stay-card { margin-left: 30px; background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 0.5px solid #EAEAEA; }
+        .stay-label { display: inline-block; font-size: 10px; background: #F0EDE9; color: var(--accent); padding: 2px 8px; border-radius: 4px; margin-bottom: 10px; font-weight: 700; }
 
-        /* 住宿資訊卡片 (住宿優先) */
-        .stay-card { margin-left: 45px; background: var(--card-bg); border-radius: 20px; padding: 22px; margin-bottom: 25px; box-shadow: var(--shadow); }
-        .stay-label { font-size: 10px; font-weight: 800; color: var(--accent); letter-spacing: 1.5px; margin-bottom: 10px; text-transform: uppercase; }
-        .stay-name { font-size: 19px; font-weight: 700; margin-bottom: 6px; }
-        .stay-addr { font-size: 13px; color: var(--text-sub); line-height: 1.5; margin-bottom: 15px; }
-        .btn-outline { display: inline-flex; align-items: center; gap: 8px; color: var(--text-main); text-decoration: none; font-size: 13px; font-weight: 600; border: 1px solid #E5E5E5; padding: 10px 18px; border-radius: 12px; transition: 0.2s; }
-        .btn-outline:active { background: #F5F5F7; }
+        /* 天氣模組 */
+        .weather-banner { display: flex; overflow-x: auto; gap: 12px; margin: 0 0 24px 30px; }
+        .w-hour { background: #FFF; padding: 12px; border-radius: 12px; min-width: 65px; text-align: center; font-size: 11px; }
+        .w-hour i { font-size: 16px; color: #FFB000; margin: 6px 0; display: block; }
 
-        /* 行程卡片排列方式 (仿截圖) */
-        .item-card { margin-left: 45px; background: var(--card-bg); border-radius: 20px; margin-bottom: 15px; padding: 20px; box-shadow: var(--shadow); display: flex; gap: 18px; }
-        .item-icon-area { width: 35px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 5px; }
-        .item-icon-area i { font-size: 22px; color: #D1D1D6; }
+        /* 核心行程卡片 - 分類設計 */
+        .item { margin-left: 30px; background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .item-time { font-size: 26px; font-weight: 800; margin-bottom: 12px; display: flex; align-items: baseline; gap: 10px; }
+        .item-cat { font-size: 10px; color: #AAA; border: 0.5px solid #EEE; padding: 1px 6px; border-radius: 4px; font-weight: 600; }
         
-        .item-main-area { flex: 1; }
-        .item-top { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; }
-        .item-time { font-size: 28px; font-weight: 800; color: var(--text-main); letter-spacing: -1px; }
-        .item-badge { font-size: 10px; color: var(--text-sub); border: 0.8px solid #E5E5E5; padding: 2px 8px; border-radius: 6px; font-weight: 700; text-transform: uppercase; }
-        
-        .item-title { font-size: 17px; font-weight: 600; margin-bottom: 6px; color: #1C1C1E; }
-        .item-content { font-size: 13px; color: var(--text-sub); line-height: 1.6; }
-        .important-red { color: #FF3B30; font-weight: 700; }
+        .item-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+        .item-body { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
 
-        /* 底部操作欄 */
-        .bottom-float { position: fixed; bottom: 30px; left: 20px; right: 20px; background: #1C1C1E; color: #FFF; border-radius: 20px; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 15px 35px rgba(0,0,0,0.25); }
-        .next-wrap { display: flex; align-items: center; gap: 15px; }
-        .next-t { font-size: 26px; font-weight: 700; }
-        .next-d { font-size: 12px; }
-        .next-l { font-size: 10px; opacity: 0.5; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 1px; }
+        /* 導遊標籤功能 */
+        .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 5px; margin: 4px 4px 0 0; font-weight: 600; }
+        .tag-food { background: #FFF4E5; color: #E67E22; } /* 必吃 */
+        .tag-spot { background: #EBF5FB; color: #2980B9; } /* 攻略 */
+        .tag-ref { background: #F4ECF7; color: #8E44AD; } /* 預約 */
+        .important { color: var(--status-red); font-weight: 700; }
+
+        /* 導航按鈕 - 修正版 */
+        .nav-btn { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 15px; padding: 12px; border-radius: 12px; background: #1A1A1A; color: #FFF; text-decoration: none; font-size: 13px; font-weight: 600; }
+        
+        /* 底部導覽 */
+        .bottom-nav { position: fixed; bottom: 20px; left: 16px; right: 16px; background: #1A1A1A; color: #FFF; border-radius: 24px; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="trip-title">基督城</div>
+    <div class="year-label">MARCH 2026</div>
+    <h1 class="city-header">Christchurch</h1>
 </header>
 
-<nav class="date-scroller">
-    <a href="#" class="date-item active"><span class="date-day">WED</span><span class="date-num">04</span></a>
-    <a href="#" class="date-item"><span class="date-day">THU</span><span class="date-num">05</span></a>
-    <a href="#" class="date-item"><span class="date-day">FRI</span><span class="date-num">06</span></a>
-    <a href="#" class="date-item"><span class="date-day">SAT</span><span class="date-num">07</span></a>
-    <a href="#" class="date-item"><span class="date-day">SUN</span><span class="date-num">08</span></a>
-    <a href="#" class="date-item"><span class="date-num">...</span></a>
+<nav class="date-nav">
+    <a href="#" class="date-tab active"><span class="d-w">WED</span><span class="d-n">04</span></a>
+    <a href="#" class="date-tab"><span class="d-w">THU</span><span class="d-n">05</span></a>
+    <a href="#" class="date-tab"><span class="d-w">FRI</span><span class="d-n">06</span></a>
+    <a href="#" class="date-tab"><span class="d-w">SAT</span><span class="d-n">07</span></a>
+    <a href="#" class="date-tab"><span class="d-w">SUN</span><span class="d-n">08</span></a>
 </nav>
 
-<div class="main-container">
-    <div class="day-indicator">第一天</div>
-
-    <div class="hero-card">
-        <img src="https://images.unsplash.com/photo-1507699622108-4be3abd695ad?auto=format&fit=crop&w=800&q=80">
-        <div class="hero-overlay">基督城啟程</div>
-    </div>
+<main class="container">
+    <div class="day-sidebar">DAY 01</div>
 
     <div class="stay-card">
-        <div class="stay-label">Current Accommodation</div>
-        <div class="stay-name">Airbnb - Canterbury Region</div>
-        <div class="stay-addr">31 Allen Street, Christchurch Central City, Christchurch 8011 紐西蘭</div>
-        <a href="https://www.google.com/maps/search/?api=1&query=Lake+Matheson3" class="btn-outline"><i class="fas fa-map-location-dot"></i> Google Maps 導航</a>
+        <span class="stay-label"><i class="fas fa-bed"></i> 住宿・ACCOMMODATION</span>
+        <div class="item-title">Airbnb - Canterbury Region</div>
+        <div class="item-body">
+            31 Allen Street, Christchurch Central City<br>
+            <span class="tag tag-spot">攻略</span> 鄰近 Latimer Square，步行可達 Riverside Market。
+        </div>
+        <a href="https://www.google.com/maps/search/?api=1&query=31+Allen+Street+Christchurch" class="nav-btn">
+            <i class="fas fa-location-arrow"></i> 開啟地圖導航
+        </a>
     </div>
 
-    <div class="item-card">
-        <div class="item-icon-area"><i class="fas fa-plane"></i></div>
-        <div class="item-main-area">
-            <div class="item-top">
-                <span class="item-time">09:05</span>
-                <span class="item-badge">Flight NZ214</span>
-            </div>
-            <div class="item-title">紐西蘭航空 (航程 3h 25m)</div>
-            <div class="item-content">
-                <span class="important-red">07:35am 關櫃 (Check-in/Bag Drop)</span><br>
-                Booking Reference: <b>AG58IH</b><br>
-                Arrives: 2:30pm
-            </div>
+    <div class="weather-banner">
+        <div class="w-hour">現在<i class="fas fa-sun"></i>16°</div>
+        <div class="w-hour">14:00<i class="fas fa-cloud-sun"></i>19°</div>
+        <div class="w-hour">16:00<i class="fas fa-cloud"></i>18°</div>
+        <div class="w-hour">18:00<i class="fas fa-sun"></i>15°</div>
+    </div>
+
+    <div class="item">
+        <div class="item-time">09:05 <span class="item-cat">FLIGHT</span></div>
+        <div class="item-title">紐西蘭航空 NZ214</div>
+        <div class="item-body">
+            <span class="important">⚠️ 07:35 托運截止 (Check-in Closes)</span><br>
+            <span class="tag tag-ref">代號: AG58IH</span>
+            <span class="tag tag-spot">航程 3h 25m</span>
         </div>
     </div>
 
-    <div class="item-card">
-        <div class="item-icon-area"><i class="fas fa-bus-simple"></i></div>
-        <div class="item-main-area">
-            <div class="item-top">
-                <span class="item-time">15:07</span>
-                <span class="item-badge">Purple Line</span>
-            </div>
-            <div class="item-title">搭乘紫線公車前往市區</div>
-            <div class="item-content">
-                建議班次：15:07 或 15:37<br>
-                從機場巴士站出發
-            </div>
+    <div class="item">
+        <div class="item-time">15:07 <span class="item-cat">BUS</span></div>
+        <div class="item-title">紫線公車 (Purple Line)</div>
+        <div class="item-body">
+            班次: 15:07 / 15:37<br>
+            <span class="tag tag-spot">攻略</span> 機場出口步行 3 分鐘即可到達巴士站。
         </div>
     </div>
 
-    <div class="item-card">
-        <div class="item-icon-area"><i class="fas fa-utensils"></i></div>
-        <div class="item-main-area">
-            <div class="item-top">
-                <span class="item-time">17:00</span>
-                <span class="item-badge">Dinner</span>
-            </div>
-            <div class="item-title">Bar Yoku (The Welder)</div>
-            <div class="item-content">
-                20 Welles Street, Christchurch Central City<br>
-                <a href="https://www.google.com/maps/search/?api=1&query=Lake+Matheson4" style="color:var(--accent); text-decoration:none; font-weight:600; display:inline-block; margin-top:8px;">查看餐廳地圖 →</a>
-            </div>
+    <div class="item">
+        <div class="item-time">17:00 <span class="item-cat">DINNER</span></div>
+        <div class="item-title">Bar Yoku (The Welder)</div>
+        <div class="item-body">
+            <span class="tag tag-food">必吃: 壽司塔可 (Sushi Tacos)</span>
+            <span class="tag tag-food">必點: 炭烤串燒</span><br>
+            這是一家結合日式與紐式風格的餐酒館，環境極佳。
         </div>
+        <a href="https://www.google.com/maps/search/?api=1&query=Bar+Yoku+Christchurch" class="nav-btn">
+            <i class="fas fa-utensils"></i> 導航至餐廳
+        </a>
     </div>
-</div>
+</main>
 
-<div class="bottom-float">
-    <div class="next-wrap">
-        <div class="next-t">17:00</div>
-        <div class="next-d">
-            <div class="next-l">Next Event</div>
-            <div>晚餐：Bar Yoku</div>
-        </div>
+<div class="bottom-nav">
+    <div>
+        <div style="font-size: 10px; opacity: 0.5;">NEXT UP</div>
+        <div style="font-size: 14px; font-weight: 700;">17:00 晚餐：Bar Yoku</div>
     </div>
-    <i class="fas fa-chevron-right" style="opacity: 0.3;"></i>
+    <i class="fas fa-chevron-right"></i>
 </div>
 
 </body>
