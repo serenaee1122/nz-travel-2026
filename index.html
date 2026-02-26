@@ -6,118 +6,112 @@
     <title>NZ Trip 2026</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --accent: #81b29a; --bg: #fdfdfd; --text: #333; --light-gray: #f2f2f2; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 80px; }
-        
-        /* 極簡 Header */
-        header { padding: 40px 20px 20px; background: #fff; border-bottom: 1px solid #eee; }
-        header h1 { font-size: 22px; font-weight: 300; letter-spacing: 2px; margin: 0; }
-        
-        /* 即時天氣小工具 (模擬) */
-        .weather-banner { background: #3d405b; color: white; padding: 12px 20px; font-size: 12px; display: flex; justify-content: space-between; }
+        :root { --accent: #81b29a; --bg: #f8f9fa; --white: #ffffff; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); color: #333; margin: 0; padding-top: 130px; padding-bottom: 80px; scroll-behavior: smooth; }
 
-        /* 摺疊行程卡片 */
-        .day-group { margin: 10px 15px; background: #fff; border-radius: 8px; border: 1px solid #eee; overflow: hidden; }
-        .day-trigger { padding: 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .day-trigger h3 { margin: 0; font-size: 16px; font-weight: 500; }
-        .day-trigger .date { font-size: 11px; color: var(--accent); font-weight: bold; }
-        
-        /* 展開的內容 */
-        .day-content { display: none; padding: 0 20px 20px 20px; border-top: 1px solid #f9f9f9; }
-        .day-content.active { display: block; }
+        /* 固定頂部區域 */
+        .fixed-header { position: fixed; top: 0; left: 0; right: 0; background: var(--white); z-index: 1000; border-bottom: 1px solid #eee; }
+        header { padding: 15px 20px 5px; }
+        header h1 { font-size: 18px; font-weight: 600; margin: 0; letter-spacing: 1px; }
 
-        /* 時間線樣式 */
-        .timeline { position: relative; padding-left: 20px; border-left: 1px solid #eee; margin-top: 10px; }
-        .slot { margin-bottom: 20px; position: relative; }
-        .slot::before { content: ''; position: absolute; left: -24px; top: 5px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
-        .slot-time { font-size: 11px; color: #aaa; margin-bottom: 4px; }
-        .slot-event { font-size: 14px; font-weight: 500; }
-        .slot-desc { font-size: 13px; color: #777; margin-top: 4px; line-height: 1.5; }
+        /* 橫向日期選擇器 */
+        .date-nav { display: flex; overflow-x: auto; padding: 10px 15px 15px; gap: 10px; -webkit-overflow-scrolling: touch; }
+        .date-nav::-webkit-scrollbar { display: none; }
+        .date-item { flex: 0 0 60px; text-align: center; padding: 8px 0; border-radius: 10px; background: #f0f0f0; color: #888; text-decoration: none; transition: 0.3s; }
+        .date-item.active { background: var(--accent); color: white; box-shadow: 0 4px 10px rgba(129, 178, 154, 0.3); }
+        .date-item span { display: block; font-size: 10px; font-weight: bold; }
+        .date-item b { font-size: 16px; }
 
-        /* 標籤與按鈕 */
-        .tag { font-size: 10px; padding: 2px 6px; border-radius: 3px; background: #eee; margin-right: 5px; }
-        .nav-link { display: inline-block; margin-top: 10px; padding: 6px 12px; border: 1px solid #ddd; border-radius: 4px; text-decoration: none; color: #555; font-size: 12px; }
+        /* 行程內容 */
+        .day-section { padding: 25px 20px; background: var(--white); margin-bottom: 10px; min-height: 400px; }
+        .day-title { font-size: 20px; font-weight: 700; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center; }
+        .weather-info { font-size: 12px; color: var(--accent); font-weight: normal; }
+
+        /* 時間線 */
+        .timeline { position: relative; margin-top: 25px; padding-left: 25px; border-left: 2px solid #eee; }
+        .slot { position: relative; margin-bottom: 30px; }
+        .slot::before { content: ''; position: absolute; left: -31px; top: 5px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); border: 3px solid white; }
+        .slot-time { font-size: 11px; color: #aaa; font-weight: bold; margin-bottom: 4px; }
+        .slot-event { font-size: 15px; font-weight: 600; color: #2d3436; }
+        .slot-desc { font-size: 13px; color: #636e72; margin-top: 5px; line-height: 1.6; }
+
+        /* 按鈕與標籤 */
+        .btn-map { display: inline-flex; align-items: center; margin-top: 10px; padding: 6px 12px; border: 1px solid #eee; border-radius: 6px; text-decoration: none; color: #555; font-size: 12px; background: #fafafa; }
+        .tag { font-size: 10px; padding: 2px 6px; background: #fff2f0; color: #e07a5f; border-radius: 4px; margin-left: 5px; }
 
         /* 底部導覽 */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; border-top: 1px solid #eee; padding: 15px 0; }
-        .nav-item { flex: 1; text-align: center; font-size: 10px; color: #bbb; text-decoration: none; }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--white); display: flex; border-top: 1px solid #eee; padding: 15px 0; z-index: 1000; }
+        .nav-icon { flex: 1; text-align: center; text-decoration: none; color: #bbb; font-size: 10px; }
+        .nav-icon.active { color: var(--accent); }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>NEW ZEALAND 2026</h1>
-</header>
-
-<div class="weather-banner">
-    <span><i class="fas fa-location-dot"></i> 當前位置: Christchurch</span>
-    <span>18°C 🌤️</span>
+<div class="fixed-header">
+    <header><h1>NEW ZEALAND 2026</h1></header>
+    <div class="date-nav" id="dateNav">
+        <a href="#day1" class="date-item active" onclick="setActive(this)"><span>MAR</span><b>04</b></a>
+        <a href="#day2" class="date-item" onclick="setActive(this)"><span>MAR</span><b>05</b></a>
+        <a href="#day3" class="date-item" onclick="setActive(this)"><span>MAR</span><b>06</b></a>
+        <a href="#day4" class="date-item" onclick="setActive(this)"><span>MAR</span><b>07</b></a>
+        <a href="#day5" class="date-item" onclick="setActive(this)"><span>MAR</span><b>08</b></a>
+        <a href="#day6" class="date-item" onclick="setActive(this)"><span>MAR</span><b>09</b></a>
+        </div>
 </div>
 
-<div class="day-group">
-    <div class="day-trigger" onclick="toggleDay(this)">
-        <div>
-            <div class="date">03/04 WED</div>
-            <h3>Day 01: 基督城抵達</h3>
+<section id="day1" class="day-section">
+    <div class="day-title">Day 01: Christchurch <span class="weather-info">🌤️ 21°C</span></div>
+    <div class="timeline">
+        <div class="slot">
+            <div class="slot-time">11:00</div>
+            <div class="slot-event">✈️ 抵達基督城機場</div>
+            <div class="slot-desc">航班 CI53。辦理入境並提取行李。</div>
         </div>
-        <i class="fas fa-chevron-down"></i>
-    </div>
-    <div class="day-content">
-        <div class="timeline">
-            <div class="slot">
-                <div class="slot-time">11:00</div>
-                <div class="slot-event">✈️ 抵達基督城機場 (CI53)</div>
-                <div class="slot-desc">辦理入境，領取行李。</div>
+        <div class="slot">
+            <div class="slot-time">13:00</div>
+            <div class="slot-event">🚗 Ezi Car Rental 取車</div>
+            <div class="slot-desc">預約代號：227599023。檢查車況。<br>
+                <a href="https://www.google.com/maps/search/?api=1&query=Ezi+Car+Rental+Christchurch+Airport" class="btn-map"><i class="fas fa-location-arrow"></i> 導航</a>
             </div>
-            <div class="slot">
-                <div class="slot-time">13:00</div>
-                <div class="slot-event">🚗 Ezi Car Rental 取車</div>
-                <div class="slot-desc">確認車況與保險。預約號: 227599023</div>
-                <a href="https://www.google.com/maps/search/?api=1&query=Ezi+Car+Rental+Christchurch+Airport" class="nav-link">📍 導航到租車處</a>
-            </div>
-            <div class="slot">
-                <div class="slot-time">18:00</div>
-                <div class="slot-event">🍽️ 晚餐: Riverside Market</div>
-                <div class="slot-desc">推薦：Bar Yoku 創意壽司串。</div>
+        </div>
+        <div class="slot">
+            <div class="slot-time">18:00</div>
+            <div class="slot-event">🏠 入住 BreakFree on Cashel</div>
+            <div class="slot-desc">165 Cashel St, Christchurch Central City<br>
+                <a href="https://www.google.com/maps/search/?api=1&query=BreakFree+on+Cashel" class="btn-map"><i class="fas fa-map-marker-alt"></i> 導航</a>
             </div>
         </div>
     </div>
-</div>
+</section>
 
-<div class="day-group">
-    <div class="day-trigger" onclick="toggleDay(this)">
-        <div>
-            <div class="date">03/05 THU</div>
-            <h3>Day 02: 基督城一日遊</h3>
+<section id="day2" class="day-section">
+    <div class="day-title">Day 02: Explore City <span class="weather-info">☁️ 19°C</span></div>
+    <div class="timeline">
+        <div class="slot">
+            <div class="slot-time">09:00</div>
+            <div class="slot-event">🌸 基督城植物園</div>
+            <div class="slot-desc">放慢步調，逛逛 Hagley Park。</div>
         </div>
-        <i class="fas fa-chevron-down"></i>
-    </div>
-    <div class="day-content">
-        <div class="timeline">
-            <div class="slot">
-                <div class="slot-time">09:00</div>
-                <div class="slot-event">🌸 植物園漫步</div>
-                <div class="slot-desc">Botanic Gardens 享受早晨。</div>
-            </div>
+        <div class="slot">
+            <div class="slot-time">18:00</div>
+            <div class="slot-event">🍽️ Bar Yoku 晚餐 <span class="tag">必吃</span></div>
+            <div class="slot-desc">位於 Riverside Market，日式創意壽司。</div>
         </div>
     </div>
-</div>
+</section>
 
 <div class="bottom-nav">
-    <a href="#" class="nav-item" style="color:var(--accent)"><i class="fas fa-calendar-days" style="font-size:18px"></i><br>行程</a>
-    <a href="https://www.metservice.com/national" class="nav-item"><i class="fas fa-cloud-sun" style="font-size:18px"></i><br>天氣</a>
-    <a href="tel:111" class="nav-item"><i class="fas fa-phone" style="font-size:18px"></i><br>緊急</a>
+    <a href="#" class="nav-icon active"><i class="fas fa-map-marked-alt" style="font-size: 20px;"></i><br>行程</a>
+    <a href="https://www.metservice.com/national" class="nav-icon"><i class="fas fa-cloud-sun" style="font-size: 20px;"></i><br>天氣預報</a>
+    <a href="tel:111" class="nav-icon"><i class="fas fa-phone-alt" style="font-size: 20px;"></i><br>SOS</a>
 </div>
 
 <script>
-    function toggleDay(element) {
-        const content = element.nextElementSibling;
-        const icon = element.querySelector('.fa-chevron-down');
-        content.classList.toggle('active');
-        // 旋轉圖示效果
-        icon.style.transform = content.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
+    function setActive(el) {
+        // 移除所有 active 狀態
+        document.querySelectorAll('.date-item').forEach(item => item.classList.remove('active'));
+        // 設定點擊的為 active
+        el.classList.add('active');
     }
-</script>
 
-</body>
-</html>
+    //
