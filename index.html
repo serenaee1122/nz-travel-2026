@@ -3,197 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>NZ JOURNEY</title>
+    <title>NZ JOURNEY 2026</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg: #F7F7F5; /* 日式和紙色調 */
+            --bg: #F7F7F5;
             --card: #FFFFFF;
-            --text-primary: #1A1A1A;
-            --text-secondary: #6B6B6B;
-            --accent: #8E7A5D; /* 職人棕 */
-            --status-red: #D9534F;
-            --safe-area-bottom: env(safe-area-inset-bottom);
+            --text-main: #1A1A1A;
+            --text-sub: #6B6B6B;
+            --accent: #8E7A5D;
+            --tag-food-bg: #FFF4E5; --tag-food-text: #E67E22;
+            --tag-spot-bg: #EBF5FB; --tag-spot-text: #2980B9;
+            --tag-ref-bg: #F4ECF7; --tag-ref-text: #8E44AD;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, "Noto Sans TC", sans-serif; background: var(--bg); color: var(--text-primary); margin: 0; padding-bottom: calc(100px + var(--safe-area-bottom)); }
+        body { font-family: -apple-system, "Noto Sans TC", sans-serif; background: var(--bg); color: var(--text-main); margin: 0; padding-bottom: 120px; }
 
-        /* 頂部導覽 - 日式簡約 */
-        header { padding: 50px 20px 10px; background: var(--bg); text-align: left; }
-        .city-header { font-size: 32px; font-weight: 800; letter-spacing: -1px; margin: 0; }
-        .year-label { font-size: 14px; color: var(--accent); font-weight: 500; letter-spacing: 2px; }
+        header { padding: 60px 20px 20px; }
+        .city-title { font-size: 32px; font-weight: 800; }
 
-        /* 橫向日期 - 左右滑動 */
-        .date-nav { display: flex; overflow-x: auto; padding: 20px; gap: 20px; sticky: top; top: 0; z-index: 100; background: rgba(247, 247, 245, 0.95); backdrop-filter: blur(10px); }
-        .date-nav::-webkit-scrollbar { display: none; }
-        .date-tab { text-align: center; min-width: 40px; text-decoration: none; color: #BBB; }
-        .date-tab.active { color: var(--text-primary); font-weight: 700; position: relative; }
-        .date-tab.active::after { content: ''; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); width: 15px; height: 2px; background: var(--accent); }
-        .d-w { font-size: 10px; display: block; margin-bottom: 4px; }
-        .d-n { font-size: 20px; }
+        /* 行程卡片基礎 */
+        .item-card { 
+            background: var(--card); border-radius: 20px; padding: 20px; 
+            margin: 0 16px 16px 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden; cursor: pointer; position: relative;
+        }
 
-        /* 主容器 */
-        .container { padding: 0 16px; position: relative; }
-        .day-sidebar { writing-mode: vertical-lr; position: absolute; left: -10px; top: 10px; font-size: 20px; font-weight: 600; color: #DDD; }
-
-        /* 住宿卡片 - 置頂優化 */
-        .stay-card { margin-left: 30px; background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 0.5px solid #EAEAEA; }
-        .stay-label { display: inline-block; font-size: 10px; background: #F0EDE9; color: var(--accent); padding: 2px 8px; border-radius: 4px; margin-bottom: 10px; font-weight: 700; }
-
-        /* 天氣模組 */
-        .weather-banner { display: flex; overflow-x: auto; gap: 12px; margin: 0 0 24px 30px; }
-        .w-hour { background: #FFF; padding: 12px; border-radius: 12px; min-width: 65px; text-align: center; font-size: 11px; }
-        .w-hour i { font-size: 16px; color: #FFB000; margin: 6px 0; display: block; }
-
-        /* 核心行程卡片 - 分類設計 */
-        .item { margin-left: 30px; background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
-        .item-time { font-size: 26px; font-weight: 800; margin-bottom: 12px; display: flex; align-items: baseline; gap: 10px; }
-        .item-cat { font-size: 10px; color: #AAA; border: 0.5px solid #EEE; padding: 1px 6px; border-radius: 4px; font-weight: 600; }
+        /* 點擊展開的動態高度 */
+        .item-card.expanded { padding-bottom: 30px; }
         
-        .item-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
-        .item-body { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .item-time-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+        .item-time { font-size: 26px; font-weight: 800; }
+        .item-badge { font-size: 10px; color: #AAA; border: 0.5px solid #EEE; padding: 1px 6px; border-radius: 4px; }
 
-        /* 導遊標籤功能 */
-        .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 5px; margin: 4px 4px 0 0; font-weight: 600; }
-        .tag-food { background: #FFF4E5; color: #E67E22; } /* 必吃 */
-        .tag-spot { background: #EBF5FB; color: #2980B9; } /* 攻略 */
-        .tag-ref { background: #F4ECF7; color: #8E44AD; } /* 預約 */
-        .important { color: var(--status-red); font-weight: 700; }
+        /* 隱藏的詳細資訊區塊 */
+        .item-details { 
+            max-height: 0; opacity: 0; transition: all 0.4s ease;
+            border-top: 0px solid #EEE; margin-top: 0;
+        }
+        .item-card.expanded .item-details { 
+            max-height: 500px; opacity: 1; border-top: 0.5px solid #EEE; 
+            margin-top: 15px; padding-top: 15px; 
+        }
 
-        /* 導航按鈕 - 修正版 */
-        .nav-btn { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 15px; padding: 12px; border-radius: 12px; background: #1A1A1A; color: #FFF; text-decoration: none; font-size: 13px; font-weight: 600; }
-        
-        /* 底部導覽 */
-        .bottom-nav { position: fixed; bottom: 20px; left: 16px; right: 16px; background: #1A1A1A; color: #FFF; border-radius: 24px; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        /* 標籤樣式 */
+        .tag { display: inline-block; font-size: 11px; padding: 3px 8px; border-radius: 6px; margin: 4px 4px 0 0; font-weight: 600; }
+        .tag-food { background: var(--tag-food-bg); color: var(--tag-food-text); }
+        .tag-spot { background: var(--tag-spot-bg); color: var(--tag-spot-text); }
+        .tag-ref { background: var(--tag-ref-bg); color: var(--tag-ref-text); }
+
+        /* 導航按鈕 */
+        .nav-link-btn {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            background: #1A1A1A; color: #FFF; text-decoration: none;
+            padding: 14px; border-radius: 12px; font-weight: 600; font-size: 14px; margin-top: 15px;
+        }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="year-label">MARCH 2026</div>
-    <h1 class="city-header">Christchurch</h1>
+    <div style="font-size: 12px; color: var(--accent); letter-spacing: 2px;">NEW ZEALAND</div>
+    <h1 class="city-title">Christchurch</h1>
 </header>
 
-<nav class="date-nav">
-    <a href="#" class="date-tab active"><span class="d-w">WED</span><span class="d-n">04</span></a>
-    <a href="#" class="date-tab"><span class="d-w">THU</span><span class="d-n">05</span></a>
-    <a href="#" class="date-tab"><span class="d-w">FRI</span><span class="d-n">06</span></a>
-    <a href="#" class="date-tab"><span class="d-w">SAT</span><span class="d-n">07</span></a>
-    <a href="#" class="date-tab"><span class="d-w">SUN</span><span class="d-n">08</span></a>
-</nav>
-
-<main class="container">
-    <div class="day-sidebar">DAY 01</div>
-
-    <div class="stay-card">
-        <span class="stay-label"><i class="fas fa-bed"></i> 住宿・ACCOMMODATION</span>
-        <div class="item-title">Airbnb - Canterbury Region</div>
-        <div class="item-body">
-            31 Allen Street, Christchurch Central City<br>
-            <span class="tag tag-spot">攻略</span> 鄰近 Latimer Square，步行可達 Riverside Market。
-        </div>
-        <a href="https://www.google.com/maps/search/?api=1&query=31+Allen+Street+Christchurch" class="nav-btn">
-            <i class="fas fa-location-arrow"></i> 開啟地圖導航
-        </a>
-    </div>
-
-    <div class="weather-banner">
-        <div class="w-hour">現在<i class="fas fa-sun"></i>16°</div>
-        <div class="w-hour">14:00<i class="fas fa-cloud-sun"></i>19°</div>
-        <div class="w-hour">16:00<i class="fas fa-cloud"></i>18°</div>
-        <div class="w-hour">18:00<i class="fas fa-sun"></i>15°</div>
-    </div>
-
-    <div class="item">
-        <div class="item-time">09:05 <span class="item-cat">FLIGHT</span></div>
-        <div class="item-title">紐西蘭航空 NZ214</div>
-        <div class="item-body">
-            <span class="important">⚠️ 07:35 托運截止 (Check-in Closes)</span><br>
-            <span class="tag tag-ref">代號: AG58IH</span>
-            <span class="tag tag-spot">航程 3h 25m</span>
+<div id="itinerary">
+    <div class="item-card" onclick="this.classList.toggle('expanded')">
+        <div class="item-badge">STAY</div>
+        <div style="font-size: 18px; font-weight: 700; margin-top: 5px;">Airbnb - Canterbury Region</div>
+        <div class="item-details">
+            <div style="font-size: 13px; color: var(--text-sub);">31 Allen Street, Christchurch Central City</div>
+            <span class="tag tag-spot">攻略</span> 位於市中心安靜街區，入住密碼將於當日發送。
+            <a href="javascript:void(0)" onclick="openMap('31 Allen Street, Christchurch')" class="nav-link-btn">
+                <i class="fas fa-location-arrow"></i> 開始導航
+            </a>
         </div>
     </div>
 
-    <div class="item">
-        <div class="item-time">15:07 <span class="item-cat">BUS</span></div>
-        <div class="item-title">紫線公車 (Purple Line)</div>
-        <div class="item-body">
-            班次: 15:07 / 15:37<br>
-            <span class="tag tag-spot">攻略</span> 機場出口步行 3 分鐘即可到達巴士站。
+    <div class="item-card" onclick="this.classList.toggle('expanded')">
+        <div class="item-time-row">
+            <span class="item-time">17:00</span>
+            <span class="item-badge">DINNER</span>
+        </div>
+        <div style="font-size: 17px; font-weight: 600;">Bar Yoku</div>
+        <div class="item-details">
+            <div style="font-size: 13px; color: var(--text-sub); margin-bottom: 10px;">The Welder, 20 Welles Street</div>
+            <span class="tag tag-food">必吃美食：壽司塔可 (Sushi Tacos)</span>
+            <span class="tag tag-food">必點菜單：炭烤串燒、和牛三明治</span>
+            <span class="tag tag-spot">景點故事</span> 位於由舊工廠改造的 The Welder 園區，是基督城最火紅的日式 Fusion 餐廳。
+            <a href="javascript:void(0)" onclick="openMap('Bar Yoku, 20 Welles Street, Christchurch')" class="nav-link-btn">
+                <i class="fas fa-utensils"></i> 導航至餐廳
+            </a>
         </div>
     </div>
-
-    <div class="item">
-        <div class="item-time">17:00 <span class="item-cat">DINNER</span></div>
-        <div class="item-title">Bar Yoku (The Welder)</div>
-        <div class="item-body">
-            <span class="tag tag-food">必吃: 壽司塔可 (Sushi Tacos)</span>
-            <span class="tag tag-food">必點: 炭烤串燒</span><br>
-            這是一家結合日式與紐式風格的餐酒館，環境極佳。
-        </div>
-        <a href="https://www.google.com/maps/search/?api=1&query=Bar+Yoku+Christchurch" class="nav-btn">
-            <i class="fas fa-utensils"></i> 導航至餐廳
-        </a>
-    </div>
-</main>
-
-<div class="bottom-nav">
-    <div>
-        <div style="font-size: 10px; opacity: 0.5;">NEXT UP</div>
-        <div style="font-size: 14px; font-weight: 700;">17:00 晚餐：Bar Yoku</div>
-    </div>
-    <i class="fas fa-chevron-right"></i>
 </div>
+
+<script>
+    // 解決地址錯誤的核心：使用搜尋字串而非單純座標
+    function openMap(query) {
+        event.stopPropagation(); // 防止觸發卡片收合
+        const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+        window.open(url, '_blank');
+    }
+
+    // 觸覺回饋
+    document.querySelectorAll('.item-card').forEach(card => {
+        card.addEventListener('click', () => {
+            if (window.navigator.vibrate) window.navigator.vibrate(5);
+        });
+    });
+</script>
 
 </body>
 </html>
-<style>
-    html {
-        scroll-behavior: smooth; /* 點擊日期時平滑滾動 */
-        -webkit-overflow-scrolling: touch;
-    }
-
-    /* 啟動 GPU 硬體加速，防止滑動卡頓 */
-    .date-tab, .item, .nav-btn, .bottom-nav {
-        will-change: transform;
-        transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* 模擬原生 App 的按壓回饋 */
-    .date-tab:active, .nav-btn:active, .item:active {
-        transform: scale(0.96);
-        opacity: 0.8;
-    }
-
-    /* 讓橫向捲軸滑動更流暢 */
-    .date-nav, .weather-banner {
-        display: flex;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        overscroll-behavior-x: contain;
-    }
-    
-    .date-tab, .w-hour {
-        scroll-snap-align: start;
-    }
-</style>
-
-<script>
-    // 1. 觸覺回饋 (Haptic Feedback)
-    document.querySelectorAll('.date-tab, .nav-btn, .item').forEach(el => {
-        el.addEventListener('click', () => {
-            if (window.navigator.vibrate) {
-                window.navigator.vibrate(10); // 輕微震動 10ms
-            }
-        });
-    });
-
-    // 2. 修正導航邏輯：自動編碼地點，解決地址偏差問題
-    function goToMap(locationName) {
-        // 使用搜尋模式而非座標模式，Google 會自動找最準確的地點
-        const encodedLocation = encodeURIComponent(locationName);
-        const url = `https://www.google.com/maps/search/?api=1&query=${encodedLocation}`;
-        window.open(url, '_blank');
-    }
-</script>
